@@ -23,11 +23,13 @@ Some prompts to answer:
 
 - What features does each `Song` use in your system
   - For example: genre, mood, energy, tempo
+Each `Song` has an id, title, artist, genre, mood, energy, tempo, valence, danceability, and acousticness. 
 - What information does your `UserProfile` store
+The `UserProfile` uses favorite_genre, favorite_mood, target_energy which is the system measuring how close a song's energy is to a specific target value, and likes_acoustic which if true, the acousticness score contributes positively as in my design I have raw and warm sounding music to score high.
 - How does your `Recommender` compute a score for each song
+In my design algorithm, a score is computed for each song with seven scoring rules: Mood match, valence match, popularity, danceability sweet spot, beat strength, acousticness, and genre logic.
 - How do you choose which songs to recommend
-
-You can include a simple diagram or bullet list if helpful.
+First, based on my design, every song is given a score independently. Second, we rank the scored list and pick the top.
 
 ---
 
