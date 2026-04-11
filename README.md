@@ -27,9 +27,54 @@ Each `Song` has an id, title, artist, genre, mood, energy, tempo, valence, dance
 - What information does your `UserProfile` store
 The `UserProfile` uses favorite_genre, favorite_mood, target_energy which is the system measuring how close a song's energy is to a specific target value, and likes_acoustic which if true, the acousticness score contributes positively as in my design I have raw and warm sounding music to score high.
 - How does your `Recommender` compute a score for each song
-In my design algorithm, a score is computed for each song with seven scoring rules: Mood match, valence match, popularity, danceability sweet spot, beat strength, acousticness, and genre logic.
+In my design algorithm, a score is computed for each song with seven scoring rules: Mood match, valence match, popularity, danceability sweet spot, beat strength, acousticness, and genre logic. I added an 8th rule which is activity matching based on if they are for preferred_activities ["driving", "studying"]. I believe a potential bias I expect will be the popularity factor based on how I planned and set the rules.
 - How do you choose which songs to recommend
 First, based on my design, every song is given a score independently. Second, we rank the scored list and pick the top.
+
+### Data Flow
+
+```mermaid
+flowchart TD
+    A([🎵 data/songs.csv\n18 songs]) --> B[load_songs\nparse CSV → list of dicts]
+    P([👤 user_prefs\ngenre · mood · energy\nvalence · tempo · acoustic\nactivities]) --> C
+
+    B --> LOOP
+
+    subgraph LOOP["🔁 recommend_songs — loops over every song"]
+        C[pick one song dict] --> D
+
+        subgraph SCORE["score_song(song, user_prefs)"]
+            D[Rule 1: Genre match\nexact +2.0 · family +1.0]
+            D --> E[Rule 2: Mood match\nexact +1.5 · family +0.75]
+            E --> F[Rule 3: Energy proximity\nup to +2.0]
+            F --> G[Rule 4: Valence proximity\nup to +1.5]
+            G --> H[Rule 5: Tempo proximity\nup to +1.5]
+            H --> I[Rule 6: Danceability zone\n+1.0 sweet spot · +0.5 near-miss]
+            I --> J[Rule 7: Acousticness\nup to +1.0]
+            J --> K[Rule 8: Activity match\n+1.0 per match · max +2.0]
+        end
+
+        K --> L["return (song, score, explanation)"]
+        L --> M{More songs?}
+        M -- yes --> C
+    end
+
+    M -- no, 18 songs scored --> N["sort by score descending\nscored.sort(reverse=True)"]
+    N --> O["slice top-k\nscored[:5]"]
+    O --> R
+
+    subgraph R["📋 Output — main.py prints top 5"]
+        R1["#1 Rooftop Lights     8.90"]
+        R2["#2 Midnight Coding    7.74"]
+        R3["#3 Library Rain       7.70"]
+        R4["#4 Broken Compass     7.54"]
+        R5["#5 Focus Flow         7.10"]
+    end
+```
+
+### Sample Output
+
+![Recommendation Output](recommendation_output.png)
 
 ---
 
@@ -117,7 +162,7 @@ Combines reflection and model card framing from the Module 3 guidance. :contentR
 
 Give your recommender a name, for example:
 
-> VibeFinder 1.0
+> BamBam
 
 ---
 
