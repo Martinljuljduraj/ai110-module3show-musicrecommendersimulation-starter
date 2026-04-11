@@ -11,7 +11,7 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+BamBam is a music recommender that scores songs based on how well they match a user's taste profile. It uses eight rules — genre, mood, energy, valence, tempo, danceability, acousticness, and activity match — to give every song a score and return the top picks. I ran it against three realistic user profiles and seven adversarial edge cases to see where it holds up and where it breaks.
 
 ---
 
@@ -132,6 +132,8 @@ Use this section to document the experiments you ran. For example:
 - What happened when you added tempo or valence to the score
 - How did your system behave for different types of users
 
+I ran a weight shift experiment — I doubled the energy weight from 2.0 to 4.0 and halved the genre weight from 2.0 to 1.0 to test how sensitive the system was to a single change. The result was more dramatic than I expected. The Lofi Scholar started getting mid-energy songs that had nothing to do with lofi, just because their energy value was close to the target. That told me energy was already the dominant signal before the shift, and the genre weight wasn't doing as much work as I thought. I also tested seven adversarial profiles with contradictory preferences — like wanting a peaceful mood but a very high energy level — to see if the system would crash or return something reasonable. It handled all of them without breaking, though the results for those profiles weren't always meaningful.
+
 ---
 
 ## Limitations and Risks
@@ -145,6 +147,12 @@ Examples:
 - It might over favor one genre or mood
 
 You will go deeper on this in your model card.
+
+- The catalog only has 18 songs, so niche users like jazz or classical fans have almost no real options
+- Energy now controls about 30% of the score, which means it can overpower everything else and lock users into a narrow range of songs
+- The danceability sweet spot is hardcoded, so ambient and classical songs always get penalized even if the user loves that style
+- The system has no way to say "I don't know" — it always returns something, even when nothing fits well
+- It does not understand lyrics, language, culture, or any context outside of the numeric features
 
 ---
 
