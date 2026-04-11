@@ -76,6 +76,17 @@ flowchart TD
 
 ![Recommendation Output](recommendation_output.png)
 
+### User Profile Recommendations
+
+#### Indie Enthusiast Profile
+![Indie Enthusiast Recommendations](indie_enthusiast.png)
+
+#### Lofi Scholar Profile
+![Lofi Scholar Recommendations](lofi_scholar.png)
+
+#### Gym Enthusiast Profile
+![Gym Enthusiast Recommendations](gym_enthusiast.png)
+
 ---
 
 ## Getting Started

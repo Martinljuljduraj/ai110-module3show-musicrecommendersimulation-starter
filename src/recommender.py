@@ -59,10 +59,10 @@ def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, str]:
 
     Returns (score, explanation_string).
 
-    Scoring recipe (max ≈ 11.5 points):
-      Rule 1 – Genre logic       : exact +2.0 | indie-family +1.0
+    Scoring recipe (max ≈ 13.5 points):
+      Rule 1 – Genre logic       : exact +1.0 | indie-family +0.5  (halved)
       Rule 2 – Mood match        : exact +1.5 | mood-family  +0.75
-      Rule 3 – Energy proximity  : up to +2.0  (linear decay over [0, 1])
+      Rule 3 – Energy proximity  : up to +4.0  (linear decay over [0, 1], doubled)
       Rule 4 – Valence proximity : up to +1.5  (linear decay over [0, 1])
       Rule 5 – Tempo proximity   : up to +1.5  (linear decay over ±80 BPM)
       Rule 6 – Danceability zone : +1.0 if in [0.55, 0.85], +0.5 if near-miss
@@ -75,14 +75,14 @@ def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, str]:
     fav_genre  = user_prefs.get("favorite_genre", "").lower().strip()
 
     # ------------------------------------------------------------------
-    # Rule 1: Genre logic (+2.0 exact, +1.0 indie-family)
+    # Rule 1: Genre logic (+1.0 exact, +0.5 indie-family) — halved weight
     # ------------------------------------------------------------------
     if song_genre == fav_genre:
-        score += 2.0
-        reasons.append(f"genre match ({song_genre}) +2.0")
-    elif song_genre in _INDIE_FAMILY and fav_genre in _INDIE_FAMILY:
         score += 1.0
-        reasons.append(f"indie-family genre ({song_genre}) +1.0")
+        reasons.append(f"genre match ({song_genre}) +1.0")
+    elif song_genre in _INDIE_FAMILY and fav_genre in _INDIE_FAMILY:
+        score += 0.5
+        reasons.append(f"indie-family genre ({song_genre}) +0.5")
 
     # ------------------------------------------------------------------
     # Rule 2: Mood match (+1.5 exact, +0.75 mood-family)
@@ -98,11 +98,11 @@ def score_song(song: Dict, user_prefs: Dict) -> Tuple[float, str]:
         reasons.append(f"mood family ({song_mood}≈{fav_mood}) +0.75")
 
     # ------------------------------------------------------------------
-    # Rule 3: Energy proximity (up to +2.0)
+    # Rule 3: Energy proximity (up to +4.0) — doubled weight
     # ------------------------------------------------------------------
     target_energy = user_prefs.get("target_energy", 0.5)
     energy_delta  = abs(float(song.get("energy", 0.5)) - target_energy)
-    energy_points = 2.0 * max(0.0, 1.0 - energy_delta)
+    energy_points = 4.0 * max(0.0, 1.0 - energy_delta)
     score += energy_points
     reasons.append(f"energy proximity +{energy_points:.2f}")
 
